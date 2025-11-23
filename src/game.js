@@ -17,6 +17,11 @@
 
     var stars = [];
 
+    var game_sounds = {
+        correct:new Audio('correct.mp3'),
+        incorrect:new Audio('incorrect.mp3')
+    }
+
 
     var game_colors = {
         background:"black",
@@ -194,13 +199,16 @@
             if(this.quizz.state=="question"){
                 if(this.quizz.current_question.selected_answer!=undefined){
                     this.current_button=undefined
+
                     if(this.quizz.current_question.selected_answer.valid==true){
                         quizz_scene.set_background_color("green")
-                        this.quizz.set_header("Correct")
+                        this.quizz.set_header("Bonne réponse !")
+                        game_sounds.correct.play()
                         this.quizz.score+=1
                     }else{
                         quizz_scene.set_background_color("red")
-                        this.quizz.set_header("Incorrect")
+                        game_sounds.incorrect.play()
+                        this.quizz.set_header("Mauvaise réponse ... ")
                     }
                     ////console.log(this.quizz.score)
                     ////console.log((this.quizz.score/this.quizz.questions.length)*100)
