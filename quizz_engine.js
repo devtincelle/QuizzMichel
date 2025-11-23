@@ -1,13 +1,3 @@
-<center>
-
-
-
-
-<canvas id="myCanvas" width="290" height="500">
-Your browser does not support the HTML canvas tag.
-</canvas>
-
-<script>
     var canvas = document.getElementById("myCanvas");
     var context = canvas.getContext("2d");
     canvas.width  = window.innerWidth*0.7;
@@ -24,6 +14,9 @@ Your browser does not support the HTML canvas tag.
     var current_question_index = -1
     var current_question = 0
     var selected_answer = undefined
+
+    var stars = [];
+
 
     var game_colors = {
         background:"black",
@@ -45,10 +38,10 @@ Your browser does not support the HTML canvas tag.
 
     function update_layout(){
 
-        var min_width = 290
-        var min_height= 500
-        var max_height= 700
-        var max_width = 620
+        var min_height= 1080
+        var max_height= 1080
+        var min_width = 1920
+        var max_width = 1920
         var calculated_width = window.innerWidth > min_width ? window.innerWidth : min_width
         var calculated_eigth = window.innerHeight > min_height ? window.innerHeight : min_height
 
@@ -84,12 +77,10 @@ Your browser does not support the HTML canvas tag.
     update_layout()
 
     canvas.addEventListener('mousedown', function(e) {
-        const rect = canvas.getBoundingClientRect()
-        const x = event.clientX - rect.left
-        const y = event.clientY - rect.top
-        mouse_x = x
-        mouse_y = y
-        mouse_down = true
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
     })
 
     function shuffle_array(array) {
@@ -113,10 +104,11 @@ Your browser does not support the HTML canvas tag.
     });
 
     function distance_to_mouse(_x,_y){
-        dx = mouse_x - _x
-        dy = mouse_y - _y
-        return Math.sqrt(dx+dy)
-    }    
+        const dx = mouse_x - _x;
+        const dy = mouse_y - _y;
+        return Math.sqrt(dx*dx + dy*dy);
+    }
+
 
     function mouse_in_box(_x,_y,_w,_h){
         if(mouse_x > _x && mouse_x < _x+_w){
@@ -279,8 +271,9 @@ Your browser does not support the HTML canvas tag.
                 y =offset_y+(l*game_layout.interline)
                 context.fillStyle =this.color;
                 context.font = game_layout.font
-                x+=Math.random()*1
-                y+=Math.random()*1
+                x+=Math.random()*2
+                y+=Math.random()*2
+
                 context.fillText(lines[l], x+this.adjust_x, y+this.adjust_y);  
             }
             this.animation_tick+=1
@@ -292,17 +285,8 @@ Your browser does not support the HTML canvas tag.
         this.displayed_letters = 0
 
         this.truncate_line = function(_line,_index){
-            var truccated_line = ""
-            for (var l=0; l< _line.length;l++){
-                if(l>_index){
-                    break
-                }                
-                if(l>_index){
-                    break
-                }
-                truccated_line+=_line[l]
-            }     
-            return truccated_line       
+            if (_index >= _line.length) return _line;
+            return _line.slice(0, _index + 1);
         }
 
     }
@@ -331,12 +315,10 @@ Your browser does not support the HTML canvas tag.
                 this.questions_list.push(new Question(this).load(_data.questions[q]).set(0,game_layout.margin_top))
             }
             this.questions_list = shuffle_array(this.questions_list)
-            for (var q in this.questions_list){
-                if(q >= this.max_questions){
-                    break
-                }
-                this.questions.push(this.questions_list[q])
+            for (let i = 0; i < Math.min(this.questions_list.length, this.max_questions); i++){
+                this.questions.push(this.questions_list[i]);
             }
+
             this.header = new Text("?",this).set(0,game_layout.margin_top)
             this.update_question_number()
 
@@ -482,11 +464,11 @@ Your browser does not support the HTML canvas tag.
         this.draw = function(){
             var color = this.idle_color
             var nb_lines = this.text.get_number_of_lines()
-            if( mouse_in_box(this.x,this.y, this.width, this.height*nb_lines)==true){
-                color = this.hover_color
-                this._question.select(this)
+            var hitW = this.text.get_width();
+            if (mouse_in_box(this.x, this.y, hitW, this.height * nb_lines)){
+                this._question.select(this);
                 context.fillStyle = "blue";
-                context.fillRect(this.x,this.y, this.text.get_width(), this.height*nb_lines);
+                context.fillRect(this.x, this.y, hitW, this.height * nb_lines);
             }
             this.text.set_color(color)
             this.text.draw()
@@ -740,310 +722,6 @@ Your browser does not support the HTML canvas tag.
 
 
 
-    var QUIZZ_DATA = {
-
-        questions:[
-            {   
-                text:"les élections TPE ont lieu tout les ...",
-                correction: "Les elections TPE ( Très Petite Entreprise ) n'ont lieu que tous les quatres ans, les dernières étaient en 2020 !",
-                answers:[
-                {
-                    text:"quatre ans",
-                    valid:true
-                },                    
-                {
-                    text:"deux ans",
-                    valid:false
-                },                {
-                    text:"ans",
-                    valid:false
-                },
-                ]
-            },             
-            {   
-                text:"Pour pouvoir voter aux elections TPE en 2024 il faut ...",
-                correction: "Pour pouvoir voter aux elections TPE en 2024 il suffit d'avoir travaillé dans une TPE en décembre 2023",
-                answers:[
-                {
-                    text:"avoir travaillé dans une TPE en décembre 2023",
-                    valid:true
-                },                    
-                {
-                    text:"s'être inscrit sur les listes electorales TPE",
-                    valid:false
-                },                {
-                    text:"faire parti d'un syndicat",
-                    valid:false
-                },
-                ]
-            }, 
-            {   
-                text:"La convention collective du cinéma d'animation a été crée en ...",
-                correction: "Le 6 juillet 2024",
-                answers:[
-                {
-                    text:"2004 ",
-                    valid:true
-                },                    
-                {
-                    text:"2010",
-                    valid:false
-                },
-                {
-                    text:"1990",
-                    valid:false
-                }
-                ]
-            },             
-            {   
-                text:"Tous les studios d'animation doivent respecter La convention collective ...",
-                correction: "Une convention collective s'applique immédiatement aux signataires et via l'extension du ministère du travail à toutes les entreprises relevant de la convention collective.",
-                answers:[
-                        {
-                            text:"vrai ",
-                            valid:true
-                        },                    
-                        {
-                            text:"faux",
-                            valid:false
-                        }
-                    ]
-                }, 
-                {   
-                text:"L'article 7 de la convention concerne ",
-                correction: "Titre : Exercice du droit syndical et liberté d'opinion",
-                answers:[
-                    {
-                        text:"l'exercice du droit syndical",
-                        valid:true
-                    },                    
-                    {
-                        text:"Les congés payés",
-                        valid:false
-                    },                    {
-                        text:"Les congés maladie",
-                        valid:false
-                    },
-                ]
-            },            
-            {   
-                text:"En 2022 le nombre de salariés du secteur était de",
-                correction: "En 2022, le secteur franchit pour la première fois la barre symbolique des 10 000 salariés (10 172)",
-                answers:[
-                    {
-                        text:"10 172",
-                        valid:true
-                    },                    
-                    {
-                        text:"8 523",
-                        valid:false
-                    },                {
-                        text:"21 052",
-                        valid:false
-                    },
-                ]
-            },            
-            {   
-                text:"Le SPIAC CGT , Le SNTPCT et la CNT sont des syndicats qui représentent",
-                correction: "Le SPIAC CGT , Le SNTPCT et la CNT sont des syndicats de salariés ",
-                answers:[
-                    {
-                        text:"des salariés",
-                        valid:true
-                    },                    
-                    {
-                        text:"des employeurs",
-                        valid:false
-                    }
-                ]
-            },            
-            {
-                text:"Il est légal de recevoir un salaire brut en dessous de la convention collective",
-                correction: "On ne peut payer un salarié du cinéma d'animation en dessous du salaire minima lié à son poste",
-                answers:[
-                    {
-                        text:"faux",
-                        valid:true
-                    },                    
-                    {
-                        text:"vrai",
-                        valid:false
-                    }
-                ]
-            } ,           
-            {
-                text:"AnimFrance est un syndicat qui représente",
-                correction: "AnimFrance est un syndicat de producteurs , à l'instar du SPI ",
-                answers:[
-                    {
-                        text:"des salariés ",
-                        valid:false
-                    },                    
-                    {
-                        text:"des employeurs",
-                        valid:true
-                    }
-                ]
-            },            
-            {
-                text:"Quel est l'IDCC de la Convention collective de la production de films d'animation ?",
-                correction: "l'IDCC (Identifiant Des Conventions Collectives) de la Convention collective de la production de films d'animation est 2412",
-                answers:[
-                    {
-                        text:"2412",
-                        valid:true
-                    },                     
-                    {
-                        text:"2411",
-                        valid:false
-                    },                    
-                    {
-                        text:"2410",
-                        valid:false
-                    },                    
-                    {
-                        text:"2409",
-                        valid:false
-                    }
-                ]
-            },            
-            {
-                text:"L'article 16 de la convention concerne ",
-                correction: "Article 16 de la convention encadre le recrutement",
-                answers:[
-                    {
-                        text:"Le recrutement ",
-                        valid:true
-                    },                     
-                    {
-                        text:"La rédaction du contrat de travail ",
-                        valid:false
-                    },                    
-                    {
-                        text:"La médecine du travail ",
-                        valid:false
-                    },                    
-                    {
-                        text:"Les périodes de congés",
-                        valid:false
-                    }
-                ]
-            },              
-            {
-                text:"L'article 38 de la convention concerne ",
-                correction: "Article 38 de la convention encadre Le statut du salarié à domicile ( télétravail )",
-                answers:[
-                    {
-                        text:"Le statut du salarié à domicile ",
-                        valid:true
-                    },                     
-                    {
-                        text:"La rédaction du contrat de travail ",
-                        valid:false
-                    },                    
-                    {
-                        text:"La médecine du travail ",
-                        valid:false
-                    },                    
-                    {
-                        text:"Les périodes de congés",
-                        valid:false
-                    }
-                ]
-            },           
-            {
-                text:"La convention collective impose-t-elle une grille salariale minimum pour chaque catégorie de poste ?",
-                correction: "Pour toutes les catégories ! ",
-                answers:[
-                    {
-                        text:"Oui, pour toutes les catégories",
-                        valid:true
-                    },                     
-                    {
-                        text:"Non, uniquement pour les postes de création",
-                        valid:false
-                    },                    
-                    {
-                        text:"Non, uniquement pour les postes techniques",
-                        valid:false
-                    }
-                ]
-            },            
-            {
-                text:"La convention collective s'applique ...",
-                correction: "La convention collective s'applique à tout le territoire Français ,France métropolitaine et France d'outre-mer ",
-                answers:[
-                    {
-                        text:"À tout le territoire français",
-                        valid:true
-                    },                     
-                    {
-                        text:"À l'Union européenne uniquement",
-                        valid:false
-                    },                    
-                    {
-                        text:"À la France métropolitaine",
-                        valid:false
-                    }
-                ]
-            },
-            {
-                text:"L'employeur, qui ne compte pas proposer de nouveau contrat à un salarié en CDDU, doit avertir le salarié de sa volonté sous ...",
-                correction: "Selon l'article 18 de la convention, l'employeur doit avertir le salarié en CDDU qu'il ne compte pas lui proposer de nouveau contrat sous 1 mois de préavis",
-                answers:[
-                    {
-                        text:"1 mois de préavis",
-                        valid:true
-                    },                     
-                    {
-                        text:"3 mois de préavis",
-                        valid:false
-                    },                    
-                    {
-                        text:"2 mois de préavis",
-                        valid:false
-                    }
-                ]
-            },            
-            {
-                text:"Si l'employeur compte modifier un contrat en cour il doit obligatoirement ...",
-                correction: "On ne peut modifier un contrat signé sans un avenant, que le salarié peut d'ailleurs refuser... ",
-                answers:[
-                    {
-                        text:"Proposer au salarié de signer un avenant",
-                        valid:true
-                    },                     
-                    {
-                        text:"Trouver un accord à l'amiable avec le salarié",
-                        valid:false
-                    },                    
-                    {
-                        text:"Proposer au salarié un nouveau contrat",
-                        valid:false
-                    }
-                ]
-            },            
-            {
-                text:"Selon la convention , proposer à un salarié un contrat 'au forfait' est ",
-                correction: "Bien que la pratique du forfait soit très répandue, notamment en storyboard, elle reste totalement illégale",
-                answers:[
-                    {
-                        text:"Illégal",
-                        valid:true
-                    },                     
-                    {
-                        text:"Légal",
-                        valid:false
-                    },                    
-                    {
-                        text:"Légal pour certain postes comme le storyboard",
-                        valid:false
-                    }
-                ]
-            }
-        ]
-    }
-
     game_graphics.santa.src = 'http://www.collectif-les-etincelles.fr/wp-content/uploads/2024/11/santa_2.png';
     game_graphics.santa.onload = function() {
         init()
@@ -1051,8 +729,4 @@ Your browser does not support the HTML canvas tag.
     }
 
 
-
-
-
-</script>
 
