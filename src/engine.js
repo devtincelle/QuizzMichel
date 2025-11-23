@@ -138,29 +138,39 @@
             return lines
         }
 
-        this.draw = function(){
-            this.bottom_y = 0
-            if (this.animation_tick % 8 ==0){
-                this.animated_content = this.truncate_line(this.content,this.displayed_letters)
-                this.displayed_letters+=1
-            }
-            var lines = this._split(this.animated_content)
-            var offset_y = this._parent.y+this.y
-            var x = this._parent.x+this.x
-            var y = offset_y
-            
-            for(var l in lines){
-                y =offset_y+(l*game_layout.interline)
-                context.fillStyle =this.color;
-                context.font = game_layout.font
-                x+=Math.random()*2
-                y+=Math.random()*2
+        this.draw = function () {
+            this.bottom_y = 0;
 
-                context.fillText(lines[l], x+this.adjust_x, y+this.adjust_y);  
+            if (this.animation_tick % 8 == 0) {
+                this.animated_content = this.truncate_line(this.content, this.displayed_letters);
+                this.displayed_letters += 1;
             }
-            this.animation_tick+=1
-            //console.log(y)
-            return this.bottom_y = y
+
+            var lines = this._split(this.animated_content);
+            var offset_y = this._parent.y + this.y;
+            var x = this._parent.x + this.x;
+            var y = offset_y;
+
+            for (var l in lines) {
+                y = offset_y + (l * game_layout.interline);
+
+                context.fillStyle = this.color;
+                context.font = game_layout.font;
+
+                // Safe jitter that does not break accents
+                const jitterX = 0;
+                const jitterY = 0;
+
+                context.fillText(
+                    lines[l],
+                    x + this.adjust_x + jitterX,
+                    y + this.adjust_y + jitterY
+                );
+            }
+
+            this.animation_tick += 1;
+
+            return (this.bottom_y = y);
         }
 
         this.animation_tick = 0
@@ -396,7 +406,9 @@
             this.y+=this.vy*0.5
         }
         this.draw = function(){
-            context.fillStyle = "white";
+            colors = ["black","yellow","blue","green","red","black"]
+            random_color = colors[Math.round(Math.random()*colors.length)]
+            context.fillStyle = random_color;
             context.font = game_layout.font;                           
             context.fillText(this.symbol,this.x,this.y);  
             /*
@@ -454,7 +466,7 @@
         }
         this.draw = function(){
             this._current_scene.draw()
-            this._santa.draw()
+            //this._santa.draw()
         }
         this.next_scene = function(){
 

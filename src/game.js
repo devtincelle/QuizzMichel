@@ -18,8 +18,8 @@
     var stars = [];
 
     var game_sounds = {
-        correct:new Audio('correct.mp3'),
-        incorrect:new Audio('incorrect.mp3')
+        correct:new Audio('assets/audio/correct.mp3'),
+        incorrect:new Audio('assets/audio/incorrect.mp3')
     }
 
 
@@ -72,7 +72,7 @@
             margin_top:30,
             interline:font_size,
             font_size:font_size,
-            font:"20px Courier New",
+            font:"22px Arial",
             quizz_width:quizz_width,
             quizz_height:quizz_height,
             quizz_x:(canvas.width/2)-(quizz_width/2),
@@ -126,9 +126,9 @@
 
 
     // FX
-    function init_stars(_symbols){
+    function init_stars(_symbols,_population){
         stars = []
-        for(var s = 0; s < 100 ; s++){
+        for(var s = 0; s < _population ; s++){
             var rand_x = Math.random()*canvas.width
             var rand_y = Math.random()*canvas.height
             star = new Star(rand_x,rand_y)
@@ -154,7 +154,7 @@
         var menu_scene = new Scene("menu")
         menu_scene.set_background_color("red")
         menu_scene.init = function(){
-            init_stars("#")
+            init_stars("#",CONFIG.number_of_stars)
             ////console.log(this._name)
             this.add_button("start","Commencer le quizz --> ",0,canvas.height-50)
             
@@ -182,9 +182,9 @@
             ////console.log(this._name)
             this.quizz = new Quizz(quizz_scene)
             this.add_button("next_question","Question suivante >",0,canvas.height-50)
-            this.quizz.load_questions(QUIZZ_DATA)
+            this.quizz.load_questions(QUESTIONS)
             this.quizz.start()
-            init_stars(".")
+            init_stars(".",CONFIG.number_of_stars)
         }    
         quizz_scene.draw = function(){
             this.draw_background()
@@ -237,9 +237,9 @@
         var score_scene = new Scene("score")
         score_scene.set_background_color("black")
         score_scene.init = function(){
-            init_stars("*")
-            var message = "Bravo "+quizz_game.score+"% de bonnes réponses ! Merci d'avoir fait ce quizz et Joyeux Noël ! "
-            this.end_message = new Text(message,{x:0,y:0}).set(game_layout.quizz_x,game_layout.quizz_y+game_layout.margin_top)
+            init_stars("#",CONFIG.number_of_stars)
+            var message = "Bravo "+quizz_game.score+"% de bonnes réponses ! Merci d'avoir participé à 'Crêpe and Quizz' ! "
+            this.end_message = new Text(message,{x:0,y:0}).set(game_layout.quizz_x,game_layout.quizz_y+50)
             this.end_message.set_color("yellow")
             this.add_button("restart","<< Recommencer",0,canvas.height-50)
         }   
@@ -267,7 +267,6 @@
         quizz_game.add_scene(quizz_scene)
         quizz_game.add_scene(score_scene)
         quizz_game.set_current_scene("menu")
-        //next_question()
 
     }
 
@@ -278,6 +277,7 @@
 
 
     game_graphics.santa.src = 'assets/graphics/flying.png';
+    
     game_graphics.santa.onload = function() {
         init()
         setInterval(main_loop)
