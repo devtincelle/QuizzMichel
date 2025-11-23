@@ -25,6 +25,9 @@ Your browser does not support the HTML canvas tag.
     var current_question = 0
     var selected_answer = undefined
 
+    var stars = [];
+
+
     var game_colors = {
         background:"black",
         text:"white",
@@ -84,12 +87,10 @@ Your browser does not support the HTML canvas tag.
     update_layout()
 
     canvas.addEventListener('mousedown', function(e) {
-        const rect = canvas.getBoundingClientRect()
-        const x = event.clientX - rect.left
-        const y = event.clientY - rect.top
-        mouse_x = x
-        mouse_y = y
-        mouse_down = true
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
     })
 
     function shuffle_array(array) {
@@ -113,10 +114,11 @@ Your browser does not support the HTML canvas tag.
     });
 
     function distance_to_mouse(_x,_y){
-        dx = mouse_x - _x
-        dy = mouse_y - _y
-        return Math.sqrt(dx+dy)
-    }    
+        const dx = mouse_x - _x;
+        const dy = mouse_y - _y;
+        return Math.sqrt(dx*dx + dy*dy);
+    }
+
 
     function mouse_in_box(_x,_y,_w,_h){
         if(mouse_x > _x && mouse_x < _x+_w){
@@ -279,8 +281,9 @@ Your browser does not support the HTML canvas tag.
                 y =offset_y+(l*game_layout.interline)
                 context.fillStyle =this.color;
                 context.font = game_layout.font
-                x+=Math.random()*1
-                y+=Math.random()*1
+                x+=Math.random()*2
+                y+=Math.random()*2
+
                 context.fillText(lines[l], x+this.adjust_x, y+this.adjust_y);  
             }
             this.animation_tick+=1
@@ -292,17 +295,8 @@ Your browser does not support the HTML canvas tag.
         this.displayed_letters = 0
 
         this.truncate_line = function(_line,_index){
-            var truccated_line = ""
-            for (var l=0; l< _line.length;l++){
-                if(l>_index){
-                    break
-                }                
-                if(l>_index){
-                    break
-                }
-                truccated_line+=_line[l]
-            }     
-            return truccated_line       
+            if (_index >= _line.length) return _line;
+            return _line.slice(0, _index + 1);
         }
 
     }
@@ -331,12 +325,10 @@ Your browser does not support the HTML canvas tag.
                 this.questions_list.push(new Question(this).load(_data.questions[q]).set(0,game_layout.margin_top))
             }
             this.questions_list = shuffle_array(this.questions_list)
-            for (var q in this.questions_list){
-                if(q >= this.max_questions){
-                    break
-                }
-                this.questions.push(this.questions_list[q])
+            for (let i = 0; i < Math.min(this.questions_list.length, this.max_questions); i++){
+                this.questions.push(this.questions_list[i]);
             }
+
             this.header = new Text("?",this).set(0,game_layout.margin_top)
             this.update_question_number()
 
@@ -482,11 +474,11 @@ Your browser does not support the HTML canvas tag.
         this.draw = function(){
             var color = this.idle_color
             var nb_lines = this.text.get_number_of_lines()
-            if( mouse_in_box(this.x,this.y, this.width, this.height*nb_lines)==true){
-                color = this.hover_color
-                this._question.select(this)
+            var hitW = this.text.get_width();
+            if (mouse_in_box(this.x, this.y, hitW, this.height * nb_lines)){
+                this._question.select(this);
                 context.fillStyle = "blue";
-                context.fillRect(this.x,this.y, this.text.get_width(), this.height*nb_lines);
+                context.fillRect(this.x, this.y, hitW, this.height * nb_lines);
             }
             this.text.set_color(color)
             this.text.draw()
