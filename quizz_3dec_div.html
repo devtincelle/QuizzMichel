@@ -6,8 +6,9 @@
 <style>
     body {
         margin: 0;
-        background: #e8e1d5;
-        font-family: "Fredoka", "Comic Sans MS", sans-serif;
+        /*background: #e8e1d5;*/
+        background: #2f2e2c;
+        font-family: "Fredoka", "Holywood", sans-serif;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -78,9 +79,40 @@
         border-radius: 20px;
         font-size: 18px;
     }
+    .snow {
+        pointer-events: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .snowflake {
+        position: absolute;
+        top: -10px;
+        color: white;
+        font-size: 12px;
+        opacity: 0.8;
+        animation-name: fall;
+        animation-timing-function: linear;
+    }
+
+    @keyframes fall {
+        0% {
+            transform: translateY(-10px) rotate(0deg);
+            opacity: 0.8;
+        }
+        100% {
+            transform: translateY(110vh) rotate(360deg);
+            opacity: 0.2;
+        }
+    }
 </style>
 </head>
 <body>
+<div class="snow" id="snow"></div>
 
 <div id="quiz"></div>
 <script src="assets/data/quizz/etincelles_3dec/questions.js" charset="utf-8" ></script>
@@ -93,7 +125,39 @@
 let index = 0;
 let selected = 0;
 let locked = false;
+let current_team = 1
+let valid = true
+let scores = [0,0,0]
 window.quizz_state = "start"
+// ------------------------------
+// SNOW GENERATOR
+// ------------------------------
+function createSnow() {
+    const snowContainer = document.getElementById("snow");
+    const total = 40;  // number of flakes (tune this)
+
+    for (let i = 0; i < total; i++) {
+        const flake = document.createElement("div");
+        flake.className = "snowflake";
+        flake.innerHTML = "❄";
+
+        // Random size
+        const size = Math.random() * 12 + 10;
+        flake.style.fontSize = size + "px";
+
+        // Random horizontal starting point
+        flake.style.left = Math.random() * 100 + "vw";
+
+        // Random animation duration
+        flake.style.animationDuration = (4 + Math.random() * 6) + "s";
+
+        // Random animation delay
+        flake.style.animationDelay = Math.random() * 5 + "s";
+
+        snowContainer.appendChild(flake);
+    }
+}
+
 
 
 function renderQuestion() {
@@ -130,6 +194,19 @@ function updateSelection() {
     document.querySelectorAll(".answer")[selected].classList.add("selected");
 }
 
+function nextState(){
+    if(index < QUESTIONS.questions.length){
+        if (window.quizz_state=="correction"){
+            window.quizz_state = "question"
+        }else if(window.quizz_state=="question"){
+            window.quizz_state = "correction"
+        }
+    }else{
+        window.quizz_state = "end"
+    }
+
+}
+
 document.addEventListener("keydown", (e) => {
     if (locked) return;
 
@@ -148,21 +225,15 @@ document.addEventListener("keydown", (e) => {
 
     if (e.key === "Enter") {
         //locked = true;
-
-        if(index < QUESTIONS.questions.length){
-            if (window.quizz_state=="correction"){
-                window.quizz_state = "question"
-            }else if(window.quizz_state=="question"){
-                window.quizz_state = "correction"
+        const chosen = q.answers[selected];
+        valid = chosen.valid
+        if (chosen.valid!=undefined){
+            if (valid){
+                scores[current_team]+=1
             }
-        }else{
-            window.quizz_state = "end"
         }
 
-        const chosen = q.answers[selected];
-        const card = document.getElementById("card");
-
-
+        nextState()
         nextStep();
         
     }
@@ -179,9 +250,15 @@ function renderCorrection(){
 
     const correction_text = q.correction 
     const valid_answer = get_valid_answer(q)
-    
+    let verdict_text = ""
+    if(valid){
+        verdict_text = "bonne réponse !"
+    }else{
+        verdict_text = "maivaise réponse !"
+    }
     
     card.innerHTML = `
+        <h1>${verdict_text}</h1>
         <h1>${valid_answer}</h1>
         <h1>${correction_text}</h1>
     `;
@@ -255,9 +332,14 @@ function nextStep() {
                     
         
     }, 100);
+
 }
 window.quizz_state = "question"
 renderQuestion();
+setInterval(() => {
+    createSnow();
+}, 2000);
+
 </script>
 
 </body>
