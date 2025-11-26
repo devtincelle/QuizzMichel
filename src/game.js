@@ -150,10 +150,18 @@
     
     function init(){
         
+        var slides = new SlideManager()
+        slides.register("splashscreen")
+        slides.register("game")
+        slides.register("score")
+        slides.register("intro")
+
+
         // MENU
         var menu_scene = new Scene("menu")
         menu_scene.set_background_color("red")
         menu_scene.init = function(){
+
             init_stars("#",CONFIG.number_of_stars)
             ////console.log(this._name)
             this.add_button("start","Commencer le quizz --> ",0,canvas.height-50)
@@ -210,8 +218,6 @@
                         game_sounds.incorrect.play()
                         this.quizz.set_header("Mauvaise réponse ... ")
                     }
-                    ////console.log(this.quizz.score)
-                    ////console.log((this.quizz.score/this.quizz.questions.length)*100)
                     this.quizz.current_question.selected_answer=undefined
                     this.quizz.set_state("correction")
                 }
@@ -267,6 +273,8 @@
         quizz_game.add_scene(quizz_scene)
         quizz_game.add_scene(score_scene)
         quizz_game.set_current_scene("menu")
+
+        slides.show("splashscreen")
 
     }
 
