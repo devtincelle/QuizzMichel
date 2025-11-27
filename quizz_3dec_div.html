@@ -129,6 +129,13 @@ let current_team = 1
 let valid = true
 let scores = [0,0,0]
 window.quizz_state = "start"
+
+
+var game_sounds = {
+    correct:new Audio('assets/audio/correct.mp3'),
+    incorrect:new Audio('assets/audio/incorrect.mp3')
+}
+
 // ------------------------------
 // SNOW GENERATOR
 // ------------------------------
@@ -215,11 +222,13 @@ document.addEventListener("keydown", (e) => {
 
     if (e.key === "ArrowDown") {
         selected = (selected + 1) % items.length;
+        game_sounds.bloub.play()
         updateSelection();
     }
 
     if (e.key === "ArrowUp") {
         selected = (selected - 1 + items.length) % items.length;
+        game_sounds.corbloubrect.play()
         updateSelection();
     }
 
@@ -230,6 +239,9 @@ document.addEventListener("keydown", (e) => {
         if (chosen.valid!=undefined){
             if (valid){
                 scores[current_team]+=1
+                game_sounds.correct.play()
+            }else{
+                game_sounds.incorrect.play()
             }
         }
 
