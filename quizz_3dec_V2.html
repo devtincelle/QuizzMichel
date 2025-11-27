@@ -185,6 +185,7 @@ let question_index = 0
 var game = new Game()
 game.add_state("intro",function(id){
     console.log(id)
+    question_index = 0
 
 })
 game.add_state("menu",function(id){
@@ -197,7 +198,10 @@ game.add_state("menu",function(id){
 
 // QUESTION VIEW
 game.add_state("question",function(id){
-
+    if(question_index == QUESTIONS.questions.length){
+        game.show_state("outro")
+        return
+    }
     if(question_index < QUESTIONS.questions.length){
         question_index++
     }
@@ -233,10 +237,7 @@ game.add_state("question",function(id){
 // CORRECTION VIEW
 game.add_state("correction",function(id){
     console.log(id)
-    if(question_index == QUESTIONS.questions.length){
-        game.show_state("outro")
-        return
-    }
+
 
     locked = false;
 
@@ -274,7 +275,7 @@ game.add_state("correction",function(id){
 
     document.getElementById(id).innerHTML = "";
     document.getElementById(id).appendChild(card);
-    selected = 0;
+    selected_answer=0
 
 },function(id){
     console.log(id)
