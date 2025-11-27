@@ -173,36 +173,107 @@ function createSnow() {
 
 let question_index = 0
 var game = new Game()
-game.add_state("intro",function(){
+game.add_state("intro",function(id){
+    console.log(id)
 
 })
-game.add_state("menu",function(){
+game.add_state("menu",function(id){
+    console.log(id)
 
-},function(){
+},function(id){
+    console.log(id)
 
 })
 
-game.add_state("quizz",function(){
+// QUESTION VIEW
+game.add_state("question",function(id){
+    if(question_index < QUESTIONS.questions.length){
+        question_index++
+    }
 
-},function(){
+    const q = QUESTIONS.questions[question_index];
+    const shuffled = q.answers
+        .map(a => ({ ...a }))
+        .sort(() => Math.random() - 0.5);
+    q._shuffled = shuffled;
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.id = "card";
     
-})
-game.add_state("question",function(){
-    question_index++
+
+    card.innerHTML = `
+        <h1>${q.text}</h1>
+        ${q._shuffled.map((a, i) =>
+            `<div class="answer ${i === 0 ? "selected" : ""}" data-i="${i}">
+                ${a.text}
+            </div>`
+        ).join("")}
+    `;
+
+    document.getElementById(id).innerHTML = "";
+    document.getElementById(id).appendChild(card);
+
+    selected = 0;
+
+    console.log(id)
     console.log(question_index)
     
-},function(){
+},function(id){
+    console.log(id)
     console.log("udpate")
 })
-game.add_state("correction",function(){
-    if(question_index>3){
+
+// CORRECTION VIEW
+game.add_state("correction",function(id){
+    console.log(id)
+    if(question_index == QUESTIONS.questions.length){
         game.show_state("outro")
     }
-},function(){
+
+    locked = false;
+
+    const q = QUESTIONS.questions[question_index];
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.id = "card";
+
+    const correction_text = q.correction 
+    const valid_answer = get_valid_answer(q)
+    let verdict_text = ""
+    if(valid){
+        verdict_text = "bonne réponse !"
+    }else{
+        verdict_text = "mauvaise réponse !"
+    }
+    
+    card.innerHTML = `
+        <h1>${verdict_text}</h1>
+        <h1>${valid_answer}</h1>
+        <h1>${correction_text}</h1>
+    `;
+
+    document.getElementById(id).innerHTML = "";
+    document.getElementById(id).appendChild(card);
+    selected = 0;
+
+},function(id){
+    console.log(id)
     
 })
 
-game.add_state("outro",function(){
+function get_valid_answer(question){
+    for(var a in question.answers){
+        if(question.answers[a].valid){
+            return question.answers[a].text
+        }
+    }
+}
+
+
+game.add_state("outro",function(id){
+    console.log(id)
 })
 game.connect_states("intro","menu")
 game.connect_states("menu","question")
@@ -238,6 +309,8 @@ document.addEventListener("keydown", (e) => {
         game.next_state()
     }
 });
+
+
 
 </script>
 

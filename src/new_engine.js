@@ -32,10 +32,10 @@ function GameState(_name,_render_func,_udpate_func){
     this._render =_render_func
     this._udpate =_udpate_func
     this.render = function(){
-        this._render()
+        this._render(this.name)
     }        
     this.udpate = function(){
-        this._udpate()
+        this._udpate(this.name)
     }    
 }
 window.GameState = GameState
@@ -89,7 +89,16 @@ function Game(){
         if(connection==undefined){
             return this
         }
-        this.show_state(connection.next())
+        const card = document.getElementById(this.current_state);
+        card.style.animation = "fadeOut 0.5s backwards";
+
+        setTimeout(() => {
+            const next_state = connection.next()
+            const card = document.getElementById(next_state);
+            card.style.animation = "fadeIn 1s backwards";
+            this.show_state(connection.next())
+
+        }, 100);
     }
     
 }
