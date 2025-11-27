@@ -114,7 +114,9 @@
 <body>
 <div class="snow" id="snow"></div>
 <div id="intro">INTRO</div>
-<div id="quizz">QUIZZ</div>
+<div id="menu">MENU</div>
+<div id="question">QUESTION</div>
+<div id="correction">CORRECTION</div>
 <div id="outro">OUTRO</div>
 <script src="assets/data/quizz/etincelles_3dec/questions.js" charset="utf-8" ></script>
 <script>
@@ -195,183 +197,129 @@ function SlideManager(){
 }
 window.SlideManager = SlideManager
 
-slide_manager = new SlideManager()
-slide_manager.register("quizz","quizz")
-slide_manager.register("intro","intro")
-slide_manager.register("outro","outro")
 
-const state_map = {
-    "start":"intro",
-    "question":"reveal_animation",
-    "reveal_animation":"correction",
-    "correction":"question",
-    "start":"question",
-    "end":"score"
+function GameState(_name,_render_func,_udpate_func){
+    this.name =_name
+    this._render =_render_func
+    this._udpate =_udpate_func
+    this.render = function(){
+        this._render()
+    }        
+    this.udpate = function(){
+        this._udpate()
+    }    
 }
-
-function nextState(){
-    if(index < QUESTIONS.questions.length){
-        window.quizz_state = state_map[window.quizz_state]
-    }else{
-        window.quizz_state = "end"
-    }
-
-}
-
-function renderIntroScreen(){
-    locked = true;
-    slide_manager.show("intro")
-
-
-}
-function renderOutroScreen(){
-    locked = true;
-    slide_manager.show("outro")
-
-}
-
-
-const render_functions = []
-render_functions["intro"]=renderIntroScreen
-render_functions["question"]=renderQuestion
-render_functions["correction"]=renderCorrection
-render_functions["outro"]=renderOutroScreen
-
-
-
-function nextStep() {
-    const card = document.getElementById("card");
-    card.style.animation = "fadeOut 0.5s forwards";
-
-    setTimeout(() => {
-        if(window.quizz_state  == "question"){
-            index++;
+window.GameState = GameState
+function GameStateConnection(_state_A,_state_B){
+      this._state_A = _state_A
+      this._state_B = _state_B
+      this._condtion = true
+      this.next = function(){
+        if(this._condtion){
+            return this._state_B
         }
-        render_functions[window.quizz_state]()
-                    
-        
-    }, 100);
-
+      }
 }
-window.quizz_state = "start"
+window.GameState = GameState
+
+function Game(){
+    this.slides = new SlideManager()
+    this.function_table = []
+    this.state_table = []
+    this.current_state = null
+    this.state_connections = []
+    this.add_state = function(state_name,_render_function,_update_function){
+        var state = new GameState(state_name,_render_function,_update_function)
+        this.state_table[state_name]=state
+        this.slides.register(state_name,state_name)
+    }    
+    this.show_state= function(name){
+        if(this.state_table[name]==undefined){
+            return this
+        }
+        var state = this.state_table[name]
+        this.slides.show(name)
+        this.current_state = name
+        state.render()
+    }    
+    this.update= function(){
+        if(this.state_table[this.current_state]==undefined){
+            return this
+        }
+        var state = this.state_table[this.current_state]
+        state.udpate()
+    }
+    this.connect_states = function(state_A,state_B){
+        const connection = new GameStateConnection(state_A,state_B)
+        this.state_connections[state_A] = connection
+    }
+    this.next_state=function(){
+        const connection = this.state_connections[this.current_state]
+        if(connection==undefined){
+            return this
+        }
+        this.show_state(connection.next())
+    }
+    
+}
+window.Game = Game
+
+let question_index = 0
+var game = new Game()
+game.add_state("intro",function(){
+
+})
+game.add_state("menu",function(){
+
+},function(){
+
+})
+
+game.add_state("quizz",function(){
+
+},function(){
+    
+})
+game.add_state("question",function(){
+    question_index++
+    console.log(question_index)
+    
+},function(){
+    console.log("udpate")
+})
+game.add_state("correction",function(){
+    if(question_index>3){
+        game.show_state("outro")
+    }
+},function(){
+    
+})
+
+game.add_state("outro",function(){
+})
+game.connect_states("intro","menu")
+game.connect_states("menu","question")
+game.connect_states("question","correction")
+game.connect_states("correction","question")
+game.connect_states("outro","intro")
+
+game.show_state("intro")
 
 document.addEventListener("keydown", (e) => {
-    if (locked) return;
-
-    const items = document.querySelectorAll(".answer");
 
     if (e.key === "ArrowDown") {
-        selected = (selected + 1) % items.length;
-        game_sounds.bloub.play()
-        updateSelection();
+        game.update()
     }
 
     if (e.key === "ArrowUp") {
-        selected = (selected - 1 + items.length) % items.length;
-        game_sounds.corbloubrect.play()
-        updateSelection();
+        game.update()
     }
 
     if (e.key === "Enter") {
-        //locked = true;
-
-        const q = QUESTIONS.questions[index];
-        const chosen = q.answers[selected];
-        valid = chosen.valid
-        if (chosen.valid!=undefined){
-            if (valid){
-                scores[current_team]+=1
-                game_sounds.correct.play()
-            }else{
-                game_sounds.incorrect.play()
-            }
-        }
-
-        nextState()
-        nextStep();
-        
+        console.log("ENTER")
+        game.next_state()
     }
 });
-
-function renderQuestion() {
-    locked = false;
-    const q = QUESTIONS.questions[index];
-    slide_manager.show("quizz")
-
-    const shuffled = q.answers
-        .map(a => ({ ...a }))
-        .sort(() => Math.random() - 0.5);
-    q._shuffled = shuffled;
-
-    const card = document.createElement("div");
-    card.className = "card";
-    card.id = "card";
-    
-
-    card.innerHTML = `
-        <h1>${q.text}</h1>
-        ${q._shuffled.map((a, i) =>
-            `<div class="answer ${i === 0 ? "selected" : ""}" data-i="${i}">
-                ${a.text}
-            </div>`
-        ).join("")}
-    `;
-
-    document.getElementById("quiz").innerHTML = "";
-    document.getElementById("quiz").appendChild(card);
-
-    selected = 0;
-}
-
-function updateSelection() {
-    document.querySelectorAll(".answer").forEach(el => el.classList.remove("selected"));
-    document.querySelectorAll(".answer")[selected].classList.add("selected");
-}
-
-
-function renderCorrection(){
-    slide_manager.show("quizz")
-    locked = false;
-
-    const q = QUESTIONS.questions[index];
-
-    const card = document.createElement("div");
-    card.className = "card";
-    card.id = "card";
-
-    const correction_text = q.correction 
-    const valid_answer = get_valid_answer(q)
-    let verdict_text = ""
-    if(valid){
-        verdict_text = "bonne réponse !"
-    }else{
-        verdict_text = "mauvaise réponse !"
-    }
-    
-    card.innerHTML = `
-        <h1>${verdict_text}</h1>
-        <h1>${valid_answer}</h1>
-        <h1>${correction_text}</h1>
-    `;
-
-    document.getElementById("quiz").innerHTML = "";
-    document.getElementById("quiz").appendChild(card);
-    selected = 0;
-}
-
-function get_valid_answer(question){
-    for(var a in question.answers){
-        if(question.answers[a].valid){
-            return question.answers[a].text
-        }
-    }
-}
- slide_manager.show("intro")
-
-//renderQuestion();
-setInterval(() => {
-    //createSnow();
-}, 2000);
 
 </script>
 
