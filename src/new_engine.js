@@ -54,6 +54,7 @@ function GameStateConnection(_state_A,_state_B){
 window.GameStateConnection = GameStateConnection
 
 function Game(){
+    this.transition_time = 100
     this.slides = new SlideManager()
     this.function_table = []
     this.state_table = []
@@ -78,6 +79,7 @@ function Game(){
             return this
         }
         var state = this.state_table[this.current_state]
+
         state.udpate()
     }
     this.connect_states = function(state_A,state_B){
@@ -98,7 +100,7 @@ function Game(){
             card.style.animation = "fadeIn 1s backwards";
             this.show_state(connection.next())
 
-        }, 100);
+        }, this.transition_time);
     }
     
 }

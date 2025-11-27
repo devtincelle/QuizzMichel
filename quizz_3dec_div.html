@@ -258,8 +258,9 @@ window.quizz_state = "start"
 document.addEventListener("keydown", (e) => {
     if (locked) return;
 
-    const items = document.querySelectorAll(".answer");
 
+
+    const items = document.querySelectorAll(".answer");
     if (e.key === "ArrowDown") {
         selected = (selected + 1) % items.length;
         game_sounds.bloub.play()
