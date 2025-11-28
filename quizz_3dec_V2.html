@@ -135,20 +135,7 @@ let scores = [0,0,0]
 window.quizz_state = "intro"
 
 
-function shuffleArray(arr) {
-    for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        const tmp = arr[i];
-        arr[i] = arr[j];
-        arr[j] = tmp;
-    }
-}
-QUESTIONS.questions.forEach(q => shuffleArray(q.answers));
 
-var game_sounds = {
-    correct:new Audio('assets/audio/correct.mp3'),
-    incorrect:new Audio('assets/audio/incorrect.mp3')
-}
 
 // ------------------------------
 // SNOW GENERATOR
@@ -183,6 +170,21 @@ function createSnow() {
 
 let question_index = 0
 var game = new Game()
+var quizz = new Quizz()
+
+quizz.load_questions(QUESTIONS.questions)
+quizz.shuffle_answers()
+quizz.add_team("A")
+quizz.add_team("B")
+quizz.add_team("C")
+
+// game. add sound
+var game_sounds = {
+    correct:new Audio('assets/audio/correct.mp3'),
+    incorrect:new Audio('assets/audio/incorrect.mp3')
+}
+
+
 game.add_state("intro",function(id){
     console.log(id)
     question_index = 0
@@ -198,16 +200,13 @@ game.add_state("menu",function(id){
 
 // QUESTION VIEW
 game.add_state("question",function(id){
-    if(question_index == QUESTIONS.questions.length){
+    if(quizz.is_last_question()){
         game.show_state("outro")
         return
     }
-    if(question_index < QUESTIONS.questions.length){
-        question_index++
-    }
-
-    const q = QUESTIONS.questions[question_index];
-    const answers = q.answers
+    const question = quizz.next_question()
+    const team = quizz.next_team()
+    const answers = question.answers
 
     const card = document.createElement("div");
     card.className = "card";
@@ -241,25 +240,29 @@ game.add_state("correction",function(id){
 
     locked = false;
 
-    const q = QUESTIONS.questions[question_index];
+    const question = quizz.get_current_question()
+    const team = quizz.get_current_team()
 
     const card = document.createElement("div");
     card.className = "card";
     card.id = "card";
 
-    const chosen = q.answers[selected_answer];
+    const chosen = question.answers[selected_answer];
     valid = chosen.valid
     if (chosen.valid!=undefined){
         if (valid){
-            scores[current_team]+=1
+            team.increment_score()
             game_sounds.correct.play()
         }else{
             game_sounds.incorrect.play()
         }
     }
 
-    const correction_text = q.correction 
-    const valid_answer = get_valid_answer(q)
+    console.log(quizz.get_current_team())
+    console.log(quizz.teams.get_scores())
+
+    const correction_text = question.correction 
+    const valid_answer = get_valid_answer(question)
     let verdict_text = ""
     if(valid){
         verdict_text = "bonne réponse !"
