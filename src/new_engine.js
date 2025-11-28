@@ -7,7 +7,6 @@ function SlideManager(){
     }
     this.show = function(slide_name){
         for (const key in this.slide_table) {
-            console.log(key)
             var el = document.getElementById(this.slide_table[key]);
             if(el==null){
                 continue
@@ -119,10 +118,10 @@ function QuestionManager(){
     }
     this.next = function(){
         if(this.current_index<this.questions.length-1){
-            this.current_index++
-            return this.this.questions[this.current_index]
+            this.current_index+=1
+            return this.questions[this.current_index]
         }
-        this.restart()
+        this.current_index = 0
         return this.questions[this.current_index]
     }
     this.is_last = function(){
@@ -135,7 +134,7 @@ function QuestionManager(){
         return this.questions[this.current_index]
     }
 
-    this.shuffle_answers = function(){
+    this.shuffle_answers  = function(){
         this.questions.forEach(q => shuffleArray(q.answers));
     }
 
@@ -156,7 +155,7 @@ window.QuestionManager = QuestionManager
 function Team(name){
     this.name = name
     this.score = 0
-    this.inscrement_score = function(){
+    this.increment_score = function(){
         this.score+=1
     }
     this.reset = function(){
@@ -165,40 +164,61 @@ function Team(name){
 }
 
 function TeamsManager(){
-    this.curren_index = 0
+    this.current_index = 0
     this.teams = []
+    this._score_history = []
     this.reset = function(){
         this.teams = []
     }
     this.add = function(name){
         this.teams.push(new Team(name))
+        return this
     }
     this.reset_scores = function(){
-        for(t=0;t<this.teams.length;t++){
+        for(var t=0;t<this.teams.length;t++){
             this.teams[t].reset()
         }
     }
     this.restart = function(){
         this.current_index = 0
-        return this.current_index
+        this.reset_scores()
+        const scores = this.get_current_scores()
+        if(scores == undefined){
+            return this
+        }
+        this._score_history.push(scores)
+        return this
     }
     this.next = function(){
+        console.log("NEXT")
+        console.log(this.current_index)
+
         if(this.current_index<this.teams.length-1){
-            this.current_index++
+            this.current_index+=1
             return this.teams[this.current_index]
         }
-        this.restart()
+        //loop
+        this.current_index = 0
+        return this.teams[this.current_index]
+    }
+    this.get_current = function(){
         return this.teams[this.current_index]
     }
     this.increment_score= function(){
-        this.teams[this.curren_index].score+=1
+        
+        this.teams[this.current_index].score+=1
+        const scores = this.get_current_scores()
+        this._score_history.push(scores)
     }
-    this.get_scores=function(){
-        var scores = []
+    this.get_current_scores=function(){
+        var scores = {}
         for(t=0;t<this.teams.length;t++){
             scores[this.teams[t].name]=this.teams[t].score
         }
         return scores
+    }    
+    this.get_previous_scores=function(){
+        return this._score_history[this._score_history.length-1]
     }
 
     this.get_winner = function(){
@@ -219,18 +239,38 @@ window.TeamsManager = TeamsManager
 function Quizz(){
     this.teams = new TeamsManager()
     this.questions = new QuestionManager()
+
+    this.restart = function(){
+        this.questions.restart()
+        this.teams.restart()
+    }
     this.add_team = function(name){
         this.teams.add(name)
     }
     
     this.next_team = function(){
         return this.teams.next()
+    }        
+    this.increment_score  = function(){
+        return this.teams.increment_score ()
+    }    
+    this.get_current_team= function(){
+        return this.teams.get_current()
+    }
+    this.get_current_scores=function(){
+        return this.teams.get_current_scores()
+    }   
+    this.get_previous_scores =function(){
+        return this.teams.get_previous_scores ()
     }
     this.load_questions = function(list){
         this.questions.load(list)
     }
     this.next_question = function(){
         return this.questions.next()
+    }    
+    this.get_current_question = function(){
+        return this.questions.get_current()
     }
     this.is_last_question = function(){
         return this.questions.is_last()
@@ -240,6 +280,9 @@ function Quizz(){
     }
     this.increment_current_team_score = function(){
         this.teams.inscrement_score()
+    }
+    this.shuffle_answers  = function(){
+        this.questions.shuffle_answers()
     }
     
 }

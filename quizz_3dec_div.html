@@ -176,7 +176,6 @@ function SlideManager(){
     }
     this.show = function(slide_name){
         for (const key in this.slide_table) {
-            console.log(key)
             var el = document.getElementById(this.slide_table[key]);
             if(el==null){
                 continue
