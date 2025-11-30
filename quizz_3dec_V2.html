@@ -134,6 +134,7 @@
 <div id="slides" class="slide-container">
     <div id="intro" class="slide"> ... </div>
     <div id="menu" class="slide"> ... </div>
+    <div id="question_title" class="slide"> ... </div>
     <div id="question" class="slide"> ... </div>
     <div id="correction" class="slide"> ... </div>
     <div id="outro" class="slide"> ... </div>
@@ -215,6 +216,27 @@ game.add_state("intro",function(id){
 game.add_state("menu",function(id){},function(id){})
 
 // QUESTION VIEW
+game.add_state("question_title",function(id){
+    const question = quizz.get_current_question()
+    const team = quizz.get_current_team()
+    const card = document.createElement("div");
+    card.className = "card";
+    card.id = "card";
+    
+    card.innerHTML = `
+    <h1>question ${quizz.get_current_question_number()} pour équipe ${team.name}</h1>
+    `;
+
+    document.getElementById(id).innerHTML = "";
+    document.getElementById(id).appendChild(card);
+    
+    selected_answer = 0;
+
+},function(id){
+
+
+})
+
 game.add_state("question",function(id){
 
     const question = quizz.get_current_question()
@@ -488,10 +510,11 @@ game.add_state("outro",function(id){
 
 })
 game.connect_states("intro","menu")
-game.connect_states("menu","question")
+game.connect_states("menu","question_title")
+game.connect_states("question_title","question")
 game.connect_states("question","correction")
 game.connect_states("correction","score")
-game.connect_states("score","question")
+game.connect_states("score","question_title")
 game.connect_states("outro","intro")
 
 game.show_state("intro")

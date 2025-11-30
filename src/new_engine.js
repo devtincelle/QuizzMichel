@@ -238,6 +238,9 @@ function Quizz(){
     }    
     this.get_current_question = function(){
         return this.questions.get_current()
+    }    
+    this.get_current_question_number = function(){
+        return this.questions.current_index+1
     }
     this.is_last_question = function(){
         return this.questions.is_last()
