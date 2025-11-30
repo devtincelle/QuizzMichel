@@ -94,7 +94,7 @@ game.add_state("question_title",function(id){
 
     document.getElementById(id).innerHTML = "";
     if(quizz.is_last_question()){
-        game.show_state("result")
+        game.apply_state("result")
         return
     }
 
@@ -150,6 +150,8 @@ game.add_state("question",function(id){
 
     
 },function(id){
+
+    console.log(`select ${selected_answer} `)
 
     document.querySelectorAll(".answer").forEach(el => el.classList.remove("selected"));
     document.querySelectorAll(".answer")[selected_answer].classList.add("selected");
@@ -224,7 +226,12 @@ game.add_state("result",function(id){
     card.className = "card";
     card.id = "card";
 
-    const winner = quizz.get_winner_team()
+    const winners = quizz.get_winners()
+    if(winners.length>0){
+        winner = " Egalité "+[winners].join("  ")
+    }else{
+        winner = "L' équipe "+winners[0]+"  à gagné !"
+    }
 
     card.innerHTML = `
         <h1>${winner}</h1>
@@ -247,7 +254,6 @@ game.add_state("outro",function(id){
 
 })
 game.connect_states("intro","menu")
-
 game.connect_states("menu","question_title")
 game.connect_states("question_title","question")
 game.connect_states("question","correction")
@@ -257,7 +263,7 @@ game.connect_states("score","question_title")
 game.connect_states("result","outro")
 game.connect_states("outro","intro")
 
-game.show_state("intro")
+game.apply_state("intro")
 
 /*
 

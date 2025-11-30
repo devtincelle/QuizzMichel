@@ -56,8 +56,8 @@ function Quizz(){
     this.increment_current_team_score = function(){
         this.teams.inscrement_score()
     }
-    this.get_winner_team = function(){
-        this.teams.get_winner()
+    this.get_winners = function(){
+        return this.teams.get_winners()
     }
 
     
