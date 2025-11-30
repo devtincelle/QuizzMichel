@@ -227,10 +227,10 @@ game.add_state("result",function(id){
     card.id = "card";
 
     const winners = quizz.get_winners()
-    if(winners.length>0){
+    if(winners.length>1){
         winner = " Egalité "+[winners].join("  ")
     }else{
-        winner = "L' équipe "+winners[0]+"  à gagné !"
+        winner = "L' équipe "+winners[0]+" a gagné !"
     }
 
     card.innerHTML = `

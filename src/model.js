@@ -53,6 +53,7 @@ function Game(){
         console.log(_render_function)
         console.log(_update_function)
         var state = new GameState(state_name,_render_function,_update_function)
+        
         this.state_table[state_name]=state
         this.slides.register(state_name,state_name)
     }    
