@@ -1,0 +1,122 @@
+    body {
+        margin: 0;
+        /*background: #e8e1d5;*/
+        background: #2f2e2c;
+        font-family: "Fredoka", "Holywood", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: url("https://grainy-gradients.vercel.app/noise.svg");
+        opacity: 0.15;
+        pointer-events: none;
+        mix-blend-mode: multiply;
+    }
+
+    .snow {
+        pointer-events: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .snowflake {
+        position: absolute;
+        top: -10px;
+        color: white;
+        font-size: 12px;
+        opacity: 0.8;
+        animation-name: fall;
+        animation-timing-function: linear;
+    }
+
+    @keyframes fall {
+        0% {
+            transform: translateY(-10px) rotate(0deg);
+            opacity: 0.8;
+        }
+        100% {
+            transform: translateY(110vh) rotate(360deg);
+            opacity: 0.2;
+        }
+    }
+    .slide-container {
+        position: relative;
+        width: 520px;
+        height: 30%;
+        place-items: center; /* perfect centering */
+    }
+
+    .slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 520px;
+        height: 100%;
+        display: grid;
+        place-items: center; /* perfect centering */
+    }
+
+
+    .card {
+        width: 520px;
+        border-radius: 40px;
+        padding: 40px;
+        background: #ffffffcc;
+        box-shadow: 0 12px 0 #c73b3b;
+        text-align: center;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeIn 0.6s forwards ease;
+    }
+
+    @keyframes fadeIn {
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeOut {
+        to { opacity: 0; transform: translateY(-20px); }
+    }
+
+    h1 {
+        color: #0e8a53;
+        margin-bottom: 20px;
+        font-size: 30px;
+        text-shadow: 1px 1px #c73b3b;
+    }
+
+    .answer {
+        padding: 14px 20px;
+        margin: 12px 0;
+        border-radius: 20px;
+        box-shadow: 0 12px 0 #c73b3b;
+        background: #fff;
+        cursor: pointer;
+        font-size: 20px;
+        transition: 0.15s;
+        margin:10px;
+    }
+
+    .answer.selected {
+        background: #0e8a53;
+        color: white;
+        border-color: #0e8a53;
+    }
+
+    .correction {
+        margin-top: 20px;
+        background: #c73b3b;
+        color: white;
+        padding: 15px;
+        border-radius: 20px;
+        font-size: 18px;
+    }

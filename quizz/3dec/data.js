@@ -1,5 +1,5 @@
-const QUESTIONS = {
-
+const QUIZZ_DATA = {
+    teams: ["A","B","C"],
     questions: [
         // QUESTIONS JULIE         
         {
