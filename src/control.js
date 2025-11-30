@@ -4,6 +4,10 @@ function Quizz(){
     this.load= function(quizz_data){
         this.questions.load(quizz_data.questions)
         this.teams.load(quizz_data.teams)
+        this.questions.set_limit(quizz_data.question_limit)
+        if(quizz_data.shuffle_answers){
+            this.questions.shuffle_answers()
+        }
     }
     this.restart = function(){
         this.questions.restart()
@@ -41,7 +45,7 @@ function Quizz(){
         return this.questions.current_index+1
     }    
     this.get_question_total = function(){
-        return this.questions.questions.length
+        return this.questions.limit
     }
     this.is_last_question = function(){
         return this.questions.is_last()
@@ -52,9 +56,10 @@ function Quizz(){
     this.increment_current_team_score = function(){
         this.teams.inscrement_score()
     }
-    this.shuffle_answers  = function(){
-        this.questions.shuffle_answers()
+    this.get_winner_team = function(){
+        this.teams.get_winner()
     }
+
     
 }
 window.Quizz = Quizz

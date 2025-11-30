@@ -14,8 +14,9 @@
     <div id="question_title" class="slide"> ... </div>
     <div id="question" class="slide"> ... </div>
     <div id="correction" class="slide"> ... </div>
-    <div id="outro" class="slide"> ... </div>
     <div id="score" class="slide"> ... </div>
+    <div id="result" class="slide"> ... </div>
+    <div id="outro" class="slide"> ... </div>
 </div>
 
 <script src="quizz/3dec/data.js" charset="utf-8" ></script>
@@ -91,6 +92,7 @@ game.add_state("menu",function(id){},function(id){})
 // QUESTION VIEW
 game.add_state("question_title",function(id){
 
+    document.getElementById(id).innerHTML = "";
     if(quizz.is_last_question()){
         game.show_state("result")
         return
@@ -99,7 +101,7 @@ game.add_state("question_title",function(id){
     // iterate 
     quizz.next_question();
     quizz.next_team();
-    
+
     const question = quizz.get_current_question()
     const team = quizz.get_current_team()
     const card = document.createElement("div");
@@ -111,7 +113,6 @@ game.add_state("question_title",function(id){
     <h1>pour équipe ${team.name}</h1>
     `;
 
-    document.getElementById(id).innerHTML = "";
     document.getElementById(id).appendChild(card);
     
     selected_answer = 0;
@@ -177,7 +178,7 @@ game.add_state("correction", function(id) {
     }
 
     const correction_text = question.correction;
-    const valid_answer = get_valid_answer(question);
+    const valid_answer = question.get_valid_answer()
 
     let verdict_text = valid ? "bonne réponse !" : "mauvaise réponse !";
 
@@ -240,13 +241,6 @@ game.add_state("result",function(id){
 })
 
 
-function get_valid_answer(question){
-    for(var a in question.answers){
-        if(question.answers[a].valid){
-            return question.answers[a].text
-        }
-    }
-}
 
 
 game.add_state("outro",function(id){

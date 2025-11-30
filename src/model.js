@@ -92,18 +92,42 @@ function Game(){
 window.Game = Game
 
 
+function Question(data){
+    this.text = data.text
+    this.answers = data.answers
+    this.correction = data.correction
+    this.get_valid_answer = function(){
+        for(var a in this.answers){
+            if(this.answers[a].valid){
+                return this.answers[a].text
+            }
+        }
+    }
+}
+
 function QuestionManager(){
-    this.current_index = 0
+    this.current_index = -1
+    this.limit =undefined
     this.questions = []
     this.load = function(_list){
-        this.questions = _list
+        for(var q in _list){
+            this.questions.push(new Question(_list[q]))
+        }
+        this.limit = this.questions.length
+        return this
     }   
+    this.set_limit = function(_int){
+        if(_int>this.questions.length){
+            return
+        }
+        this.limit = _int
+    }
     this.restart = function(){
-        this.current_index = 0
+        this.current_index = -1
         return this.current_index
     }
     this.next = function(){
-        if(this.current_index<this.questions.length-1){
+        if(this.current_index<this.limit-1){
             this.current_index+=1
             return this.questions[this.current_index]
         }
@@ -112,10 +136,10 @@ function QuestionManager(){
     }
     this.is_last = function(){
         console.log("last_question")
-        return this.current_index==this.questions.length-1
+        return this.current_index==this.limit-1
     }    
     this.is_middle = function(){
-        return this.current_index==(Math.round(this.questions.length-1)/2)
+        return this.current_index === Math.floor((this.limit - 1) / 2);
     }
     this.get_current = function(){
         return this.questions[this.current_index]
@@ -151,7 +175,7 @@ function Team(name){
 }
 
 function TeamsManager(){
-    this.current_index = 0
+    this.current_index = -1
     this.teams = []
     this._score_history = []
     this.reset = function(){
@@ -173,7 +197,7 @@ function TeamsManager(){
         }
     }
     this.restart = function(){
-        this.current_index = 0
+        this.current_index = -1
         this.reset_scores()
         const scores = this.get_current_scores()
         if(scores == undefined){
@@ -222,6 +246,9 @@ function TeamsManager(){
                 high_score=this.teams[t].score
                 winner = this.teams[t]
             }
+        }
+        if(winner==undefined){
+            return "draw"
         }
         return winner
     }
