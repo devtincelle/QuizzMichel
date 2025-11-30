@@ -39,22 +39,39 @@ function Game(){
         this.slides.register(state_name,state_name)
     }    
     this.show_state= function(name){
-        if(this.state_table[name]==undefined){
-            return this
-        }
-        var state = this.state_table[name]
-        this.slides.show(name)
-        this.current_state = name
-        state.render()
-    }    
-    this.update= function(){
-        if(this.state_table[this.current_state]==undefined){
-            return this
-        }
-        var state = this.state_table[this.current_state]
 
-        state.udpate()
-    }
+        // Check if the current state exists in the state table
+        if (this.state_table[this.current_state] === undefined) {
+            return this;
+        }
+        
+        var state = this.state_table[this.current_state];
+
+        // show the state div 
+        this.slides.show(name)
+
+        // Check if the render function exists before calling it
+        if (typeof state.render === "function") {
+            state.render();
+        }
+        this.current_state = name
+        return this;
+    }    
+    this.update = function() {
+        // Check if the current state exists in the state table
+        if (this.state_table[this.current_state] === undefined) {
+            return this;
+        }
+
+        var state = this.state_table[this.current_state];
+
+        // Check if the update function exists before calling it
+        if (typeof state.update === "function") {
+            state.update();
+        }
+
+        return this;
+    };
     this.connect_states = function(state_A,state_B){
         const connection = new GameStateConnection(state_A,state_B)
         this.state_connections[state_A] = connection
@@ -241,6 +258,9 @@ function Quizz(){
     }    
     this.get_current_question_number = function(){
         return this.questions.current_index+1
+    }    
+    this.get_question_total = function(){
+        return this.questions.questions.length
     }
     this.is_last_question = function(){
         return this.questions.is_last()

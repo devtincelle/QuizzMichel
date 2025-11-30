@@ -224,7 +224,8 @@ game.add_state("question_title",function(id){
     card.id = "card";
     
     card.innerHTML = `
-    <h1>question ${quizz.get_current_question_number()} pour équipe ${team.name}</h1>
+    <h1>Question ${quizz.get_current_question_number()} / ${quizz.get_question_total()} </h1>
+    <h1>pour équipe ${team.name}</h1>
     `;
 
     document.getElementById(id).innerHTML = "";
