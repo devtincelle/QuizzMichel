@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <title>Retro Quiz</title>
 <link rel="stylesheet" href="assets/css/quizz.css">
+<link rel="stylesheet" href="quizz/3dec/style.css">
 </head>
 <body>
 
@@ -67,12 +68,9 @@ function createSnow() {
 var game = new Game()
 var quizz = new Quizz()
 
-quizz.load_questions(QUIZZ_DATA.questions)
-quizz.load_teams(QUIZZ_DATA.teams)
-quizz.shuffle_answers()
-quizz.add_team("A")
-quizz.add_team("B")
-quizz.add_team("C")
+quizz.load(QUIZZ_DATA)
+//quizz.shuffle_answers()
+
 
 // game. add sound
 var game_sounds = {
@@ -84,11 +82,24 @@ var game_sounds = {
 game.add_state("intro",function(id){
     quizz.restart()
 
+    document.getElementById(id).innerHTML = "";
+    addCenteredImage(id,"quizz/3dec/splash_screen.png",)
+
 })
 game.add_state("menu",function(id){},function(id){})
 
 // QUESTION VIEW
 game.add_state("question_title",function(id){
+
+    if(quizz.is_last_question()){
+        game.show_state("result")
+        return
+    }
+
+    // iterate 
+    quizz.next_question();
+    quizz.next_team();
+    
     const question = quizz.get_current_question()
     const team = quizz.get_current_team()
     const card = document.createElement("div");
@@ -114,11 +125,6 @@ game.add_state("question",function(id){
 
     const question = quizz.get_current_question()
     const team = quizz.get_current_team()
-
-    if(quizz.is_last_question()){
-        game.show_state("outro")
-        return
-    }
     const answers = question.answers
     
     const card = document.createElement("div");
@@ -139,6 +145,7 @@ game.add_state("question",function(id){
     document.getElementById(id).appendChild(card);
     
     selected_answer = 0;
+
 
     
 },function(id){
@@ -187,9 +194,6 @@ game.add_state("correction", function(id) {
     document.getElementById(id).innerHTML = "";
     document.getElementById(id).appendChild(card);
 
-    // iterate 
-    quizz.next_question();
-    quizz.next_team();
 
     locked = false;
 
@@ -213,162 +217,28 @@ game.add_state("score",function(id){
 },function(id){
 
 })
+game.add_state("result",function(id){
 
-function animate_value(from, to, duration, callback) {
-    const start = performance.now();
+    const card = document.createElement("div");
+    card.className = "card";
+    card.id = "card";
 
-    function step(now) {
-        const progress = Math.min((now - start) / duration, 1);
-        const value = from + (to - from) * progress;
-        callback(value);
-        if (progress < 1) requestAnimationFrame(step);
-    }
+    const winner = quizz.get_winner_team()
 
-    requestAnimationFrame(step);
-}
-
-function render_scores_podium() {
-    let previous_scores = quizz.get_previous_scores();
-    const scores = quizz.get_current_scores();
-    const teams = Object.keys(scores);
-    const max_score = Math.max(...Object.values(scores), 1);
-
- let html = `
-    <div id="podium" style="
-        display: flex;
-        gap: 30px;
-        justify-content: center;
-        align-items: flex-end;
-        height: 260px;
-        margin-top: 20px;
-    ">
+    card.innerHTML = `
+        <h1>${winner}</h1>
+        <h1>${render_scores_podium()}</h1>
     `;
 
-    teams.forEach(team => {
-        const previous = previous_scores[team] ?? 0;
+    document.getElementById(id).innerHTML = "";
+    document.getElementById(id).appendChild(card);
 
-        html += `
-            <div style="display:flex; flex-direction:column; align-items:center;">
+    locked = false;
 
-                <div id="score-text-${team}" style="
-                    font-size:22px;
-                    font-weight:bold;
-                    margin-bottom:6px;
-                ">
-                    ${previous}
-                </div>
+},function(id){
 
-                <div id="bar-${team}" style="
-                    width: 60px;
-                    height: ${(previous/max_score)*200}px;
-                    background: linear-gradient(180deg, #4aa3ff 0%, #1e7ae0 100%);
-                    border-radius: 6px 6px 0 0;
-                    transition: height 0.5s linear;
-                "></div>
+})
 
-                <div style="margin-top:8px;font-size:20px;font-weight:bold;">
-                    ${team}
-                </div>
-            </div>
-        `;
-    });
-
-    html += `</div>`;
-
-    // After HTML is placed in the DOM, animate the bars
-    setTimeout(() => {
-        teams.forEach(team => {
-            const old_val = previous_scores[team] ?? 0;
-            const new_val = scores[team];
-
-            const bar = document.getElementById(`bar-${team}`);
-            const scoreText = document.getElementById(`score-text-${team}`);
-
-            // Animate bar and score
-            animate_value(old_val, new_val, 700, v => {
-                // bar height
-                const maxPx = 200;
-                const h = (v / max_score) * maxPx;
-                bar.style.height = h + "px";
-
-                // score number count-up
-                scoreText.textContent = Math.floor(v);
-            });
-        });
-
-        // Save new scores for next animation
-        previous_scores = { ...scores };
-    }, 400);
-
-    return html;
-
-}
-
-function render_scores_table() {
-    let previous_scores = quizz.get_previous_scores();
-    const scores = quizz.get_current_scores();
-
-    // Create table
-    let html = `
-    <table id="score-table" style="
-        border-collapse: collapse;
-        font-size: 22px;
-        margin: 10px 0;
-    ">
-    `;
-
-    // First row: team names
-    html += `<tr>`;
-    for (const team in scores) {
-        html += `
-            <th style="
-                border: 2px solid #444;
-                padding: 10px 14px;
-                background: #f0f0f0;
-                text-align: center;
-            ">${team}</th>
-        `;
-    }
-    html += `</tr>`;
-
-    // Second row: scores (animated)
-    html += `<tr>`;
-    for (const team in scores) {
-        const old_val = previous_scores[team] ?? scores[team];
-        const new_val = scores[team];
-
-        // unique ID for each score cell
-        html += `
-            <td id="score-${team}" style="
-                border: 2px solid #444;
-                padding: 14px 18px;
-                text-align: center;
-                font-weight: bold;
-            ">${old_val}</td>
-        `;
-    }
-    html += `</tr></table>`;
-
-    // Return HTML → animation happens after insertion
-    setTimeout(() => {
-        for (const team in scores) {
-            const old_val = previous_scores[team] ?? scores[team];
-            const new_val = scores[team];
-
-            if (new_val > old_val) {
-                const el = document.getElementById(`score-${team}`);
-                animate_value(old_val, new_val, 400, v => {
-                    el.textContent = v;
-                });
-            }
-        }
-
-        // store current scores for future comparisons
-        previous_scores = { ...scores };
-    }, 10);
-
-    return html;
-}
 
 function get_valid_answer(question){
     for(var a in question.answers){
@@ -383,11 +253,14 @@ game.add_state("outro",function(id){
 
 })
 game.connect_states("intro","menu")
+
 game.connect_states("menu","question_title")
 game.connect_states("question_title","question")
 game.connect_states("question","correction")
 game.connect_states("correction","score")
+// TODO add conditionnal states that go to state A or B 
 game.connect_states("score","question_title")
+game.connect_states("result","outro")
 game.connect_states("outro","intro")
 
 game.show_state("intro")

@@ -1,7 +1,10 @@
 function Quizz(){
     this.teams = new TeamsManager()
     this.questions = new QuestionManager()
-
+    this.load= function(quizz_data){
+        this.questions.load(quizz_data.questions)
+        this.teams.load(quizz_data.teams)
+    }
     this.restart = function(){
         this.questions.restart()
         this.teams.restart()

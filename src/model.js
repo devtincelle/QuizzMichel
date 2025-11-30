@@ -111,6 +111,7 @@ function QuestionManager(){
         return this.questions[this.current_index]
     }
     this.is_last = function(){
+        console.log("last_question")
         return this.current_index==this.questions.length-1
     }    
     this.is_middle = function(){
@@ -156,6 +157,12 @@ function TeamsManager(){
     this.reset = function(){
         this.teams = []
     }
+    this.load = function(team_name_list){
+        for(var t in team_name_list){
+            this.teams.push(new Team(team_name_list[t]))
+        }
+        return this
+    }    
     this.add = function(name){
         this.teams.push(new Team(name))
         return this

@@ -23,7 +23,8 @@
     .snow {
         pointer-events: none;
         position: fixed;
-        top: 0; left: 0;
+        top: 0;
+        left: 0;
         width: 100%;
         height: 100%;
         overflow: hidden;
@@ -45,16 +46,19 @@
             transform: translateY(-10px) rotate(0deg);
             opacity: 0.8;
         }
+
         100% {
             transform: translateY(110vh) rotate(360deg);
             opacity: 0.2;
         }
     }
+
     .slide-container {
         position: relative;
         width: 520px;
         height: 30%;
-        place-items: center; /* perfect centering */
+        place-items: center;
+        /* perfect centering */
     }
 
     .slide {
@@ -64,7 +68,8 @@
         width: 520px;
         height: 100%;
         display: grid;
-        place-items: center; /* perfect centering */
+        place-items: center;
+        /* perfect centering */
     }
 
 
@@ -81,10 +86,17 @@
     }
 
     @keyframes fadeIn {
-        to { opacity: 1; transform: translateY(0); }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
+
     @keyframes fadeOut {
-        to { opacity: 0; transform: translateY(-20px); }
+        to {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
     }
 
     h1 {
@@ -103,7 +115,7 @@
         cursor: pointer;
         font-size: 20px;
         transition: 0.15s;
-        margin:10px;
+        margin: 10px;
     }
 
     .answer.selected {
@@ -119,4 +131,12 @@
         padding: 15px;
         border-radius: 20px;
         font-size: 18px;
+    }
+
+    .image-center-wrapper {
+        width: 100%;
+        height: 100%;
+        display: grid;
+        place-items: center;
+        /* PERFECT CENTER */
     }

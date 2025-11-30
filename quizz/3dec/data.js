@@ -1,5 +1,7 @@
 const QUIZZ_DATA = {
     teams: ["A","B","C"],
+    shuffle_answers: false,
+    question_limit: 3,
     questions: [
         // QUESTIONS JULIE         
         {
