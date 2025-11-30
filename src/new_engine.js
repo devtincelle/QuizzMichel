@@ -1,30 +1,4 @@
 
-function SlideManager(){
-    this.slide_table = []
-    this.current_slide = undefined
-    this.register = function(slide_name,element_id){
-        this.slide_table[slide_name] =element_id
-    }
-    this.show = function(slide_name){
-        for (const key in this.slide_table) {
-            var el = document.getElementById(this.slide_table[key]);
-            if(el==null){
-                continue
-            }
-            if(key!=slide_name){
-                el.style.display = "none";
-            }else{
-                el.style.display = "block";
-            }
-        }
-    }
-    this.next_slide = function(){
-        
-    }
-    
-}
-window.SlideManager = SlideManager
-
 
 function GameState(_name,_render_func,_udpate_func){
     this.name =_name
@@ -54,7 +28,7 @@ window.GameStateConnection = GameStateConnection
 
 function Game(){
     this.transition_time = 100
-    this.slides = new SlideManager()
+    this.slides = new AnimatedSlideManager()
     this.function_table = []
     this.state_table = []
     this.current_state = null
@@ -90,16 +64,9 @@ function Game(){
         if(connection==undefined){
             return this
         }
-        const card = document.getElementById(this.current_state);
-        card.style.animation = "fadeOut 0.5s backwards";
+        const next_state = connection.next()
+        this.show_state(connection.next())
 
-        setTimeout(() => {
-            const next_state = connection.next()
-            const card = document.getElementById(next_state);
-            card.style.animation = "fadeIn 1s backwards";
-            this.show_state(connection.next())
-
-        }, this.transition_time);
     }
     
 }
