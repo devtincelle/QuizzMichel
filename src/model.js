@@ -53,7 +53,7 @@ function Game(){
         console.log(_render_function)
         console.log(_update_function)
         var state = new GameState(state_name,_render_function,_update_function)
-        
+
         this.state_table[state_name]=state
         this.slides.register(state_name,state_name)
     }    
@@ -147,6 +147,7 @@ function Question(data){
     this.text = data.text
     this.answers = data.answers
     this.correction = data.correction
+    this.is_demo = data.is_demo != undefined ? data.is_demo : false
     this.get_valid_answer = function(){
         for(var a in this.answers){
             if(this.answers[a].valid){

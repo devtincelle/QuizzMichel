@@ -165,7 +165,7 @@ function render_scores_podium() {
     `;
 
     teams.forEach(team => {
-        const previous = previous_scores[team] ?? 0;
+        const previous = 0;
 
         html += `
             <div style="display:flex; flex-direction:column; align-items:center;">
@@ -198,7 +198,7 @@ function render_scores_podium() {
     // After HTML is placed in the DOM, animate the bars
     setTimeout(() => {
         teams.forEach(team => {
-            const old_val = previous_scores[team] ?? 0;
+            const old_val =  0;
             const new_val = scores[team];
 
             const bar = document.getElementById(`bar-${team}`);
@@ -217,8 +217,8 @@ function render_scores_podium() {
         });
 
         // Save new scores for next animation
-        previous_scores = { ...scores };
-    }, 400);
+        //previous_scores = { ...scores };
+    }, 100);
 
     return html;
 
