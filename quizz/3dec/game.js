@@ -9,6 +9,10 @@ let selected_team = 0;
 let locked = false;
 let valid = false
 
+const snow = new SnowFX("snow-container", 300);
+snow.init();
+snow.start();
+
 var game = new Game()
 var quizz = new Quizz()
 
@@ -34,7 +38,7 @@ game.add_state("menu",function(id){},function(id){})
 
 // QUESTION VIEW
 game.add_state("question_title",function(id){
-
+    //snow.restoreColors()
     
     document.getElementById(id).innerHTML = "";
     
@@ -126,10 +130,10 @@ game.add_state("correction", function(id) {
 
     if (chosen.valid != undefined) {
         if (valid) {
-            if(question.is_demo==false){
-            }
+            //snow.setColor("green")
             game_sounds.correct.play();
         } else {
+            snow.setColor("red")
             game_sounds.incorrect.play();
         }
     }
