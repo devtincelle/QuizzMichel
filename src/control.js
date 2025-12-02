@@ -16,15 +16,19 @@ function Quizz(){
     this.add_team = function(name){
         this.teams.add(name)
     }
+
     
     this.next_team = function(){
         return this.teams.next()
     }        
-    this.increment_score  = function(){
+    this.increment_score  = function(_team){
         return this.teams.increment_score ()
     }    
     this.get_current_team= function(){
         return this.teams.get_current()
+    }    
+    this.set_current_team= function(name){
+        return this.teams.set_current(name)
     }
     this.get_current_scores=function(){
         return this.teams.get_current_scores()
@@ -58,6 +62,12 @@ function Quizz(){
     }
     this.get_winners = function(){
         return this.teams.get_winners()
+    }    
+    this.get_teams = function(){
+        return this.teams.get_teams()
+    }    
+    this.get_team= function(index){
+        return this.teams.get_team(index)
     }
 
     

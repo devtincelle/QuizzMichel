@@ -243,6 +243,12 @@ function TeamsManager(){
         this.teams.push(new Team(name))
         return this
     }
+    this.get_teams = function(){
+        return this.teams
+    }    
+    this.get_team = function(index){
+        return this.teams[index]
+    }
     this.reset_scores = function(){
         for(var t=0;t<this.teams.length;t++){
             this.teams[t].reset()
@@ -267,12 +273,15 @@ function TeamsManager(){
     }
     this.get_current = function(){
         return this.teams[this.current_index]
+    }    
+    this.set_current = function(name){
+        index = name != undefined &&  this.teams.indexOf(name) != -1 ? this.teams.indexOf(name) : 0
+        return this
     }
-    this.increment_score= function(){
-        
-        this.teams[this.current_index].score+=1
-        const scores = this.get_current_scores()
-        this._score_history.push(scores)
+    this.increment_score= function(name){
+        const index = name != undefined &&  this.teams.indexOf(name) != -1 ? this.teams.indexOf(name) : this.current_index
+        this.teams[index].score+=1
+        return this
     }
     this.get_current_scores=function(){
         var scores = {}

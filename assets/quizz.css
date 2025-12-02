@@ -116,9 +116,25 @@
         font-size: 20px;
         transition: 0.15s;
         margin: 10px;
+    }   
+    .answer.selected {
+        background: #0e8a53;
+        color: white;
+        border-color: #0e8a53;
+    } 
+    .team {
+        padding: 14px 20px;
+        margin: 12px 0;
+        border-radius: 20px;
+        box-shadow: 0 12px 0 #73d8e6;
+        background: #fff;
+        cursor: pointer;
+        font-size: 20px;
+        transition: 0.15s;
+        margin: 10px;
     }
 
-    .answer.selected {
+    .team.selected{
         background: #0e8a53;
         color: white;
         border-color: #0e8a53;
