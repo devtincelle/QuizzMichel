@@ -159,7 +159,7 @@ game.add_state("score",function(id){
     card.id = "card";
 
     card.innerHTML = `
-        <h1>${render_scores_podium()}</h1>
+        <h1>${render_scores_podium(quizz)}</h1>
     `;
 
     document.getElementById(id).innerHTML = "";

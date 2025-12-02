@@ -34,7 +34,11 @@ game.add_state("intro",function(id){
     addCenteredImage(id,"quizz/3dec/splash_screen.png",)
 
 })
-game.add_state("menu",function(id){},function(id){})
+game.add_state("menu",function(id){
+
+
+},function(id){
+})
 
 // QUESTION VIEW
 game.add_state("question_title",function(id){
@@ -90,13 +94,13 @@ game.add_state("question",function(id){
     card.id = "card";
     
     card.innerHTML = `
-    <h1>${question.text}</h1>
+        <h1>${smartLineBreak(question.text)}</h1>
         ${answers.map((a, i) =>
-        `<div class="answer ${i === 0 ? "selected" : ""}" data-i="${i}">
-                <span class = "question_number" > (${i+1}) </span> ${a.text}
+            `<div class="answer ${i === 0 ? "selected" : ""}" data-i="${i}">
+                ${numberCircleIconHTML(i+1)} -- ${a.text}
             </div>`
-            ).join("")}
-            `;
+        ).join("")}
+    `;
 
     document.getElementById(id).innerHTML = "";
     document.getElementById(id).appendChild(card);
@@ -133,12 +137,12 @@ game.add_state("correction", function(id) {
             //snow.setColor("green")
             game_sounds.correct.play();
         } else {
-            snow.setColor("red")
+           // snow.setColor("red")
             game_sounds.incorrect.play();
         }
     }
 
-    const correction_text = question.correction;
+    const correction_text = smartLineBreak(question.correction);
     const valid_answer = question.get_valid_answer()
 
     let verdict_text = valid ? "bonne réponse !" : "mauvaise réponse !";
@@ -179,7 +183,7 @@ game.add_state("score",function(id){
     card.id = "card";
 
     card.innerHTML = `
-        <h1>${render_scores_podium()}</h1>
+        <h1>${render_scores_podium(quizz)}</h1>
     `;
 
     document.getElementById(id).innerHTML = "";
@@ -236,7 +240,9 @@ game.add_state("result",function(id){
     }
 
    card.innerHTML = `
+    <h1>${render_scores_podium(quizz)}</h1>
        <h1>${winner}</h1>
+
    `;
 
     document.getElementById(id).innerHTML = "";
@@ -253,8 +259,9 @@ game.add_state("result",function(id){
 
 game.add_state("outro",function(id){
 
-})
+},function(id){
 
+})
 
 
 game.connect_states("intro","menu")

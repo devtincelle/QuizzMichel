@@ -147,7 +147,7 @@ function animate_value(from, to, duration, callback) {
     requestAnimationFrame(step);
 }
 
-function render_scores_podium() {
+function render_scores_podium(quizz) {
     let previous_scores = quizz.get_previous_scores();
     const scores = quizz.get_current_scores();
     const teams = Object.keys(scores);
@@ -309,4 +309,128 @@ function addCenteredImage(slideId, imageSrc, width = "600px") {
     wrapper.appendChild(img);
     slide.innerHTML = "";  // clear slide
     slide.appendChild(wrapper);
+}
+
+class ImageCarousel {
+    constructor(containerSelector, imageList) {
+        this.container = document.querySelector(containerSelector);
+        if (!this.container) throw new Error("Carousel container not found.");
+
+        this.images = imageList;
+        console.log(this.images)
+        this.index = 0;
+
+        this.imgElement = document.createElement("img");
+        this.imgElement.style.width = "100%";
+        this.imgElement.style.height = "100%";
+        this.imgElement.style.objectFit = "cover";
+        this.imgElement.style.transition = "opacity 0.3s";
+
+        this.container.appendChild(this.imgElement);
+
+        this.showImage(0);
+    }
+
+    // internal method
+    showImage(i) {
+        this.imgElement.style.opacity = 0;
+
+        setTimeout(() => {
+            console.log(this.images[i])
+            this.imgElement.src = this.images[i];
+            this.imgElement.style.opacity = 1;
+        }, 200);
+    }
+
+    next() {
+        this.index = (this.index + 1) % this.images.length;
+        this.showImage(this.index);
+    }
+
+    prev() {
+        this.index = (this.index - 1 + this.images.length) % this.images.length;
+        this.showImage(this.index);
+    }
+}
+window.ImageCarousel = ImageCarousel
+
+function numberToEmoji(num) {
+    const map = {
+        0: "0️⃣",
+        1: "1️⃣",
+        2: "2️⃣",
+        3: "3️⃣",
+        4: "4️⃣",
+        5: "5️⃣",
+        6: "6️⃣",
+        7: "7️⃣",
+        8: "8️⃣",
+        9: "9️⃣",
+        10: "🔟"
+    };
+
+    if (num in map) return map[num];
+
+    // Optional: build emoji for numbers > 10 (11 -> "1️⃣1️⃣")  
+    return String(num)
+        .split("")
+        .map(d => map[d] || d)
+        .join("");
+}
+
+function numberCircleIconHTML(num, size=24, bg="#4CAF50", color="#fff") {
+    return `<span style="
+        display:inline-flex;
+        justify-content:center;
+        align-items:center;
+        width:${size}px;
+        height:${size}px;
+        border-radius:50%;
+        background-color:${bg};
+        color:${color};
+        font-weight:bold;
+        font-size:${Math.floor(size*0.6)}px;
+        font-family:sans-serif;
+        text-align:center;
+        line-height:1;
+    ">${num}</span>`;
+}
+
+
+/**
+ * Inserts line breaks into a long text at roughly maxLineLength characters,
+ * breaking only at spaces to avoid splitting words.
+ * @param {string} text - The long text
+ * @param {number} maxLineLength - Approx max chars per line
+ * @returns {string} - Text with <br> inserted
+ */
+function addLineBreaks(text, maxLineLength = 50) {
+    const words = text.split(" ");
+    let line = "";
+    let result = "";
+
+    for (const word of words) {
+        if ((line + word).length > maxLineLength) {
+            result += line.trim() + "<br>";
+            line = "";
+        }
+        line += word + " ";
+    }
+    result += line.trim(); // add remaining
+    return result;
+}
+
+/**
+ * Insert <br> in text at:
+ * - periods, exclamation, question marks
+ * - before uppercase words (new sentences)
+ */
+function smartLineBreak(text) {
+    // 1. Break after punctuation marks
+    let result = text.replace(/([.!?])\s+/g, "$1<br>");
+
+    // 2. Optional: break before uppercase words not at start
+    result = result.replace(/(\S)\s+([A-Z][a-z]+)/g, "$1<br>$2");
+
+    return result;
 }
